@@ -49,9 +49,10 @@ class ProfileView(ListView):
         author = get_object_or_404(User, username=self.kwargs['username'])
         if self.request.user.is_authenticated:
             user = User.objects.get(username=self.request.user)
-            author = User.objects.get(username=self.kwargs['username'])
             if user.follower.filter(author=author):
                 context['following'] = True
+            if user == author:
+                context['user_author'] = True
         context['author'] = author
         return context
 
