@@ -52,7 +52,7 @@ class ViewTests(TestCase):
                 author=cls.user,
                 group=cls.group,
                 image=SimpleUploadedFile(
-                    name='small_' + str(i) + '.gif',
+                    name=f'small_{i}.gif',
                     content=SMALL_GIF,
                     content_type='image/gif',
                 ),
@@ -66,7 +66,7 @@ class ViewTests(TestCase):
                 text='ж' * (100 + i),
                 author=cls.user,
                 image=SimpleUploadedFile(
-                    name='small_' + str(i) + '.gif',
+                    name=f'small_{i}.gif',
                     content=SMALL_GIF,
                     content_type='image/gif',
                 ),
@@ -117,9 +117,7 @@ class ViewTests(TestCase):
             post_image = object.image
             self.assertEqual(post_author, ViewTests.user)
             self.assertEqual(post_text, 'ж' * (100 + post_pk))
-            self.assertEqual(
-                post_image, 'posts/small_' + str(post_pk) + '.gif'
-            )
+            self.assertEqual(post_image, f'posts/small_{post_pk}.gif')
 
     def test_group_list_page_show_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""
@@ -139,9 +137,7 @@ class ViewTests(TestCase):
             self.assertEqual(post_author, ViewTests.user)
             self.assertEqual(post_text, 'ж' * (100 + post_pk))
             self.assertEqual(post_group, ViewTests.group)
-            self.assertEqual(
-                post_image, 'posts/small_' + str(post_pk) + '.gif'
-            )
+            self.assertEqual(post_image, f'posts/small_{post_pk}.gif')
 
     def test_profile_page_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
@@ -161,9 +157,7 @@ class ViewTests(TestCase):
             post_image = object.image
             self.assertEqual(post_author, ViewTests.user)
             self.assertEqual(post_text, 'ж' * (100 + post_pk))
-            self.assertEqual(
-                post_image, 'posts/small_' + str(post_pk) + '.gif'
-            )
+            self.assertEqual(post_image, f'posts/small_{post_pk}.gif')
 
     def test_post_detail_page_auth_user_show_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом"""
@@ -182,9 +176,7 @@ class ViewTests(TestCase):
             self.assertEqual(post_author, ViewTests.user)
             self.assertEqual(post_text, 'ж' * (100 + post_pk))
             self.assertEqual(object_count, ALL_POSTS)
-            self.assertEqual(
-                post_image, 'posts/small_' + str(post_pk) + '.gif'
-            )
+            self.assertEqual(post_image, f'posts/small_{post_pk}.gif')
             self.assertTrue(post_form)
 
     def test_post_edit_page_show_correct_context(self):
@@ -335,7 +327,7 @@ class ViewTests(TestCase):
         content_3 = response.content
         self.assertNotEqual(content_1, content_3)
 
-    def test_follow_and_unfollow_correct(self):
+    def test_follow_correct(self):
         """Подписка работает правильно"""
 
         def create_posts(author):
@@ -377,6 +369,38 @@ class ViewTests(TestCase):
                 post_author = object.author
                 self.assertIn(post_author, [author_1, author_2])
 
+    def test_unfollow_correct(self):
+        """Отписка работает правильно"""
+
+        def create_posts(author):
+            posts = (
+                Post(
+                    text='ж' * (100 + i),
+                    author=author,
+                )
+                for i in range(10)
+            )
+            Post.objects.bulk_create(posts)
+
+            return
+
+        author_1 = User.objects.create_user(username='author_1')
+        author_2 = User.objects.create_user(username='author_2')
+
+        authors = [author_1, author_2]
+        for author in authors:
+            create_posts(author)
+
+        follower = User.objects.create_user(username='follower')
+        authorized_follower = Client()
+        authorized_follower.force_login(follower)
+
+        authorized_follower.get(
+            reverse('posts:profile_follow', kwargs={'username': author_1})
+        )
+        authorized_follower.get(
+            reverse('posts:profile_follow', kwargs={'username': author_2})
+        )
         authorized_follower.get(
             reverse('posts:profile_unfollow', kwargs={'username': author_2})
         )

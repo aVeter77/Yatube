@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.utils.functional import cached_property
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from .forms import CommentForm, PostForm
@@ -24,13 +25,18 @@ class GroupView(ListView):
     paginate_by = 10
     context_object_name = 'posts'
 
-    def get_queryset(self):
+    @cached_property
+    def get_group(self):
         group = get_object_or_404(Group, slug=self.kwargs['slug'])
+        return group
+
+    def get_queryset(self):
+        group = self.get_group
         return group.posts.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['group'] = context['posts'][0].group
+        context['group'] = self.get_group
         return context
 
 
@@ -40,13 +46,18 @@ class ProfileView(ListView):
     paginate_by = 10
     context_object_name = 'posts'
 
-    def get_queryset(self):
+    @cached_property
+    def get_author(self):
         author = get_object_or_404(User, username=self.kwargs['username'])
+        return author
+
+    def get_queryset(self):
+        author = self.get_author
         return author.posts.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        author = get_object_or_404(User, username=self.kwargs['username'])
+        author = self.get_author
         if self.request.user.is_authenticated:
             user = User.objects.get(username=self.request.user)
             if user.follower.filter(author=author):
@@ -147,10 +158,7 @@ class FollowIndexView(LoginRequiredMixin, ListView):
     context_object_name = 'posts'
 
     def get_queryset(self):
-        user = get_object_or_404(User, username=self.request.user)
-        posts = Post.objects.filter(
-            author__in=[following.author for following in user.follower.all()]
-        )
+        posts = Post.objects.filter(author__following__user=self.request.user)
         return posts
 
 
@@ -158,8 +166,9 @@ class ProfileFollowView(LoginRequiredMixin, ListView):
     def get(self, *args, **kwargs):
         user = get_object_or_404(User, username=self.request.user)
         author = get_object_or_404(User, username=self.kwargs['username'])
-        if not user.follower.filter(author=author) and user != author:
-            Follow.objects.create(user=user, author=author)
+        if user != author:
+            Follow.objects.get_or_create(user=user, author=author)
+
         return redirect('posts:profile', self.kwargs['username'])
 
 
@@ -167,6 +176,6 @@ class ProfileUnfollowView(LoginRequiredMixin, ListView):
     def get(self, *args, **kwargs):
         user = get_object_or_404(User, username=self.request.user)
         author = get_object_or_404(User, username=self.kwargs['username'])
-        if user.follower.filter(author=author):
-            Follow.objects.filter(user=user, author=author).delete()
+        Follow.objects.filter(user=user, author=author).delete()
+
         return redirect('posts:profile', self.kwargs['username'])
