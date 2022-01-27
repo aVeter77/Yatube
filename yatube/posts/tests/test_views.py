@@ -327,27 +327,27 @@ class ViewTests(TestCase):
         content_3 = response.content
         self.assertNotEqual(content_1, content_3)
 
+    def create_posts(self, author):
+        posts = (
+            Post(
+                text='ж' * (100 + i),
+                author=author,
+            )
+            for i in range(10)
+        )
+        Post.objects.bulk_create(posts)
+
+        return
+
     def test_follow_correct(self):
         """Подписка работает правильно"""
-
-        def create_posts(author):
-            posts = (
-                Post(
-                    text='ж' * (100 + i),
-                    author=author,
-                )
-                for i in range(10)
-            )
-            Post.objects.bulk_create(posts)
-
-            return
 
         author_1 = User.objects.create_user(username='author_1')
         author_2 = User.objects.create_user(username='author_2')
 
         authors = [author_1, author_2]
         for author in authors:
-            create_posts(author)
+            self.create_posts(author)
 
         follower = User.objects.create_user(username='follower')
         authorized_follower = Client()
@@ -372,24 +372,12 @@ class ViewTests(TestCase):
     def test_unfollow_correct(self):
         """Отписка работает правильно"""
 
-        def create_posts(author):
-            posts = (
-                Post(
-                    text='ж' * (100 + i),
-                    author=author,
-                )
-                for i in range(10)
-            )
-            Post.objects.bulk_create(posts)
-
-            return
-
         author_1 = User.objects.create_user(username='author_1')
         author_2 = User.objects.create_user(username='author_2')
 
         authors = [author_1, author_2]
         for author in authors:
-            create_posts(author)
+            self.create_posts(author)
 
         follower = User.objects.create_user(username='follower')
         authorized_follower = Client()
