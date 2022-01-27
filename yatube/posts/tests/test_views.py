@@ -336,7 +336,6 @@ class ViewTests(TestCase):
             for i in range(10)
         )
         Post.objects.bulk_create(posts)
-
         return
 
     def test_follow_correct(self):
@@ -405,25 +404,13 @@ class ViewTests(TestCase):
     def test_new_post_following_correct(self):
         """Посты у подписчиков отображаются правильно"""
 
-        def create_posts(author):
-            posts = (
-                Post(
-                    text='ж' * (100 + i),
-                    author=author,
-                )
-                for i in range(10)
-            )
-            Post.objects.bulk_create(posts)
-
-            return
-
         author_1 = User.objects.create_user(username='author_1')
         author_2 = User.objects.create_user(username='author_2')
         author_3 = User.objects.create_user(username='author_3')
 
         authors = [author_1, author_2, author_3]
         for author in authors:
-            create_posts(author)
+            self.create_posts(author)
 
         follower_1 = User.objects.create_user(username='follower_1')
         authorized_follower_1 = Client()
