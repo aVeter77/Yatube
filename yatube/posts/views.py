@@ -27,8 +27,7 @@ class GroupView(ListView):
 
     @cached_property
     def group(self):
-        group = get_object_or_404(Group, slug=self.kwargs['slug'])
-        return group
+        return get_object_or_404(Group, slug=self.kwargs['slug'])
 
     def get_queryset(self):
         return self.group.posts.all()
@@ -47,8 +46,7 @@ class ProfileView(ListView):
 
     @cached_property
     def author(self):
-        author = get_object_or_404(User, username=self.kwargs['username'])
-        return author
+        return get_object_or_404(User, username=self.kwargs['username'])
 
     def get_queryset(self):
         return self.author.posts.all()
@@ -155,8 +153,7 @@ class FollowIndexView(LoginRequiredMixin, ListView):
     context_object_name = 'posts'
 
     def get_queryset(self):
-        posts = Post.objects.filter(author__following__user=self.request.user)
-        return posts
+        return Post.objects.filter(author__following__user=self.request.user)
 
 
 class ProfileFollowView(LoginRequiredMixin, ListView):

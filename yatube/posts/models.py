@@ -59,12 +59,11 @@ class Group(models.Model):
 
     @property
     def slug_count(self):
-        slug_count = (
+        return (
             Group.objects.filter(slug__startswith=self.slug)
             .exclude(pk=self.pk)
             .count()
         )
-        return slug_count
 
     def save(self, *args, **kwargs):
         def slug_dubls(slug_count):
