@@ -61,9 +61,9 @@ jobs:
           script: |
             cd docker/yatube/
             sudo docker-compose stop
-            sudo docker-compose rm web
+            sudo docker-compose rm -f web
             sudo systemctl stop nginx
-            sudo docker image rm -f -y ${{ secrets.DOCKER_USERNAME }}/yatube:latest
+            sudo docker image rm -f ${{ secrets.DOCKER_USERNAME }}/yatube:latest
             rm .env
             touch .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
