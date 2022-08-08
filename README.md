@@ -11,7 +11,6 @@
 ## Технологии
 - [Python 3.7](https://www.python.org/)
 - [Django 2.2.16](https://www.djangoproject.com/)
-- [Django Rest Framework 3.12.4](https://www.django-rest-framework.org/)
 - [PostgreSQL 13.0](https://www.postgresql.org/)
 - [gunicorn 20.0.4](https://pypi.org/project/)
 - [nginx 1.21.3](https://nginx.org/ru/)
