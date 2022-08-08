@@ -1,27 +1,48 @@
-# Проект: Cоциальная сеть 
-## _Для публикации личных дневников_
+# Проект: Yatube Cоциальная сеть 
 
-![Yandex Practicum](https://i.ibb.co/3F7pPBj/logo.png)
-
-![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master) ![License](https://img.shields.io/apm/l/vim-mode)
+![example workflow](https://github.com/aVeter77/hw05_final/actions/workflows/main.yml/badge.svg)
 
 Социальная сеть с возможность создать учетную запись, публиковать записи, подписываться на любимых авторов и отмечать понравившиеся записи.
 
+Пример работы приложения [http://yatube.aveter77.site/](http://yatube.aveter77.site/)
+
+Образ на [Dockerhub](https://hub.docker.com/r/aveter77/yatube/tags)
+
 ## Технологии
+- [Python 3.7](https://www.python.org/)
+- [Django 2.2.16](https://www.djangoproject.com/)
+- [Django Rest Framework 3.12.4](https://www.django-rest-framework.org/)
+- [PostgreSQL 13.0](https://www.postgresql.org/)
+- [gunicorn 20.0.4](https://pypi.org/project/)
+- [nginx 1.21.3](https://nginx.org/ru/)
+- [Docker 20.10.17](https://www.docker.com/)
+- [Docker Compose 2.9](https://docs.docker.com/compose/)
 
-- Python 3.7
-- Django 2.2.19
+## Запуск
 
-### Запуск проекта в dev-режиме
-- Установите и активируйте виртуальное окружение
-- Установите зависимости из файла requirements.txt
+Установите переменные среды, как в `.env.example`.
+### Docker
 ```
-pip install -r requirements.txt
-``` 
-- В папке с файлом manage.py выполните команду:
+cd infra/
+docker-compose up -d
 ```
-python3 manage.py runserver
+После запуска выполните команды:
+```
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py createsuperuser
+docker-compose exec web python manage.py collectstatic --no-input 
 ```
 
-### Авторы
-Андрей, Стёпа, Лера и Максим 
+## Заполнение базы начальными данными
+```
+cd infra/
+cat fixtures.json | docker-compose exec -T web python manage.py loaddata --format=json -
+docker-compose cp media_fixtures/cache/ web:/app/media/
+docker-compose cp media_fixtures/posts/ web:/app/media/
+```
+
+## Автор
+Александр Николаев
+
+## Лицензия
+MIT
