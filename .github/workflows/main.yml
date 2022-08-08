@@ -44,7 +44,7 @@ jobs:
         uses: docker/build-push-action@v2 
         with:
           push: true
-          context: ./api_yamdb
+          context: ./yatube
           tags: ${{ secrets.DOCKER_USERNAME }}/yatube:v1.0-hw, ${{ secrets.DOCKER_USERNAME }}/yatube:latest
 
   deploy:
