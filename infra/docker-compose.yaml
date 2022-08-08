@@ -10,8 +10,7 @@ services:
       - ./.env
 
   web:
-    build: ../yatube/
-    image: aveter77/yatube:v1.0-hw
+    image: aveter77/yatube:latest
     restart: always
     volumes:
       - static_value:/app/static/
