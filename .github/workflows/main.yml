@@ -61,7 +61,7 @@ jobs:
           script: |
             cd docker/yatube/
             sudo docker-compose stop
-            sudo docker-compose rm -f web
+            sudo docker-compose rm -f web_yatube
             sudo systemctl stop nginx
             sudo docker image rm -f ${{ secrets.DOCKER_USERNAME }}/yatube:latest
             rm .env
